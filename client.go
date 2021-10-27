@@ -11,7 +11,7 @@ import (
 )
 
 type VerifyRequest struct {
-	Solution string `json:"solution,omitempty"`
+	Solution string `json:"solution"`
 	Secret   string `json:"secret,omitempty"`
 	Sitekey  string `json:"sitekey,omitempty"`
 }
@@ -27,6 +27,10 @@ type Client struct {
 	APIKey        string
 	Sitekey       string
 	SiteverifyURL string
+	// If Strict is set to true only strictly verified captcha solutions will be allowed.
+	// By default it is false: the accept value will be true when for instance the Friendly Captcha API
+	// could not be reached.
+	Strict bool
 }
 
 const SolutionFormFieldName = "frc-captcha-solution"
@@ -43,10 +47,6 @@ var ErrVerificationRequest = errors.New("verification request failed talking to 
 // You should notify yourself if this happens, but it's usually still a good idea to accept the captcha even though
 // we were unable to verify it: we don't want to lock users out.
 var ErrVerificationFailedDueToClientError = errors.New("verification request failed due to a client error (check your credentials)")
-
-// The response from the Friendly Captcha API was not as expected. Of course this should never happen, but
-// it's a good idea to still accept the captcha.
-var ErrVerificationUnexpectedAPIResponse = errors.New("verification failed, the Friendly Captcha API response was not as expected")
 
 func NewClient(apiKey string, sitekey string) Client {
 	return Client{
@@ -78,13 +78,13 @@ func (frc Client) CheckCaptchaSolution(ctx context.Context, captchaSolution stri
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return true, fmt.Errorf("%w: %v", ErrVerificationRequest, err)
+		return !frc.Strict, fmt.Errorf("%w: %v", ErrVerificationRequest, err)
 	}
 
 	if resp.StatusCode != 200 {
 		b, _ := io.ReadAll(resp.Body)
 		// Intentionally let this through, it's probably a problem in our credentials
-		return true, fmt.Errorf("%w (status %d): %v", ErrVerificationFailedDueToClientError, resp.StatusCode, b)
+		return !frc.Strict, fmt.Errorf("%w [status %d]: %s", ErrVerificationFailedDueToClientError, resp.StatusCode, b)
 	}
 
 	decoder := json.NewDecoder(resp.Body)
@@ -92,7 +92,7 @@ func (frc Client) CheckCaptchaSolution(ctx context.Context, captchaSolution stri
 	err = decoder.Decode(&vr)
 	if err != nil {
 		// Despite the error we will let this through - it must be a problem with the Friendly Captcha API.
-		return true, fmt.Errorf("%w: %v", ErrVerificationUnexpectedAPIResponse, err)
+		return !frc.Strict, fmt.Errorf("%w: %v", ErrVerificationRequest, err)
 	}
 
 	if !vr.Success {

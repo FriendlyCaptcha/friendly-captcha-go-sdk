@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Friendly Captcha Go SDK example</title>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.0/widget.module.min.js" async defer></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/friendly-challenge@0.9.0/widget.min.js" async defer></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/holiday.css@0.9.8" />
+
+  </head>
+  <body>
+  <main>
+    {{if .Submitted}}
+        <h1>Thanks for your message!</h1>
+        
+    {{else}}
+        <h1>Friendly Captcha Go SDK form</h1>
+        {{if .Message}}
+            <p style="color:#ba1f1f">{{.Message}}</p>
+        {{end}}
+        <form method="POST">
+            <div class="form-group">
+                <label>Subject:</label><br />
+                <input type="text" name="subject"><br />
+                <label>Message:</label><br />
+                <textarea name="message"></textarea><br />
+
+                <div class="frc-captcha" data-sitekey="{{.Sitekey}}"></div>
+                <input style="margin-top: 1em" type="submit" value="Submit">
+            </div>
+        </form>
+    {{end}}
+  </main>
+
+  <script>
+    // A trick to prevent re-submission on reloading the page.
+    if (window.history.replaceState) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+  </script>
+  </body>
+</html>
+
