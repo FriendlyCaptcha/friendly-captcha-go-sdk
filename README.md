@@ -1,2 +1,2 @@
-# friendly-captcha-go
+# friendly-captcha-go-sdk
 A Go client for the Friendly Captcha verification API
