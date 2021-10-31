@@ -73,7 +73,7 @@ func (frc Client) CheckCaptchaSolution(ctx context.Context, captchaSolution stri
 		return false, fmt.Errorf("%w: %v", ErrCreatingVerificationRequest, err)
 	}
 
-	req.Header.Set("X-Frc-Sdk", "go-sdk-0.1.0")
+	req.Header.Set("X-Frc-Sdk", "go-sdk-0.1.1")
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
