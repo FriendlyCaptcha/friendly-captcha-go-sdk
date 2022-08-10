@@ -7,18 +7,18 @@ import (
 	"net/http"
 	"os"
 
-	friendlycaptcha "github.com/friendlycaptcha/friendly-captcha-go"
+	friendlycaptcha "github.com/friendlycaptcha/friendly-captcha-go-sdk"
 )
 
 type FormMessage struct {
-    Subject string
-    Message string
+	Subject string
+	Message string
 }
 
 type TemplateData struct {
 	Submitted bool
-	Message string
-	Sitekey string
+	Message   string
+	Sitekey   string
 }
 
 func main() {
@@ -32,12 +32,12 @@ func main() {
 	frcClient := friendlycaptcha.NewClient(apikey, sitekey)
 	tmpl := template.Must(template.ParseFiles("form.html"))
 
-    http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// GET - the user is requesting the form, not submitting it.
-        if r.Method != http.MethodPost {
-            tmpl.Execute(w, TemplateData{Submitted: false, Message: "", Sitekey: sitekey})
-            return
-        }
+		if r.Method != http.MethodPost {
+			tmpl.Execute(w, TemplateData{Submitted: false, Message: "", Sitekey: sitekey})
+			return
+		}
 
 		formMessage := FormMessage{
 			Subject: r.FormValue("subject"),
@@ -55,7 +55,7 @@ func main() {
 			if errors.Is(err, friendlycaptcha.ErrVerificationFailedDueToClientError) {
 				log.Printf("!!!!!\nFriendlyCaptcha is misconfigured! Check your Friendly Captcha API key and sitekey: %s\n", err.Error())
 				// Send yourself an alert - the captcha won't be able to do its job to prevent spam.
-			} else if (errors.Is(err, friendlycaptcha.ErrVerificationRequest)) {
+			} else if errors.Is(err, friendlycaptcha.ErrVerificationRequest) {
 				log.Printf("Could not talk to the Friendly Captcha API: %s\n", err.Error())
 				// Maybe also alert yourself, maybe the Friendly Captcha API is down?
 			}
@@ -69,9 +69,9 @@ func main() {
 		// do something with the data in the form
 		_ = formMessage
 
-        tmpl.Execute(w, TemplateData{Submitted: true, Message: "", Sitekey: sitekey})
-    })
+		tmpl.Execute(w, TemplateData{Submitted: true, Message: "", Sitekey: sitekey})
+	})
 	log.Printf("Starting server on localhost port 8844 (http://localhost:8844)")
 
-    http.ListenAndServe(":8844", nil)
+	http.ListenAndServe(":8844", nil)
 }

@@ -80,6 +80,7 @@ func (frc Client) CheckCaptchaSolution(ctx context.Context, captchaSolution stri
 	if err != nil {
 		return !frc.Strict, fmt.Errorf("%w: %v", ErrVerificationRequest, err)
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		b, _ := io.ReadAll(resp.Body)
