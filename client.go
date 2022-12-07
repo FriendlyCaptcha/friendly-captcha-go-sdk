@@ -34,7 +34,7 @@ type Client struct {
 }
 
 const SolutionFormFieldName = "frc-captcha-solution"
-const defaultSiteVerifyAPIURL = "https://friendlycaptcha.com/api/v1/siteverify"
+const defaultSiteVerifyAPIURL = "https://api.friendlycaptcha.com/api/v1/siteverify"
 
 // Could not create the request body (i.e. JSON marshal it), this should never happen but if it does then probably
 // the captcha solution value is really weird - let's not accept the verification
