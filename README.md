@@ -1,5 +1,7 @@
 # friendly-captcha-go-sdk
-A Go client for the Friendly Captcha verification API.
+A Go client for the Friendly Captcha v1 verification API.
+
+> Note: This is for Friendly Captcha v1 only, if you are creating a new implementation you probably want to use the new [**Friendly Captcha Go SDK**](https://github.com/FriendlyCaptcha/friendly-captcha-go).
 
 ## Installation
 ```
